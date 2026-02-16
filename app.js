@@ -65,7 +65,7 @@ app.post("/login", async (req, res) => {
     }
 })
 
-const Product = require("./models/prodact")
+const Product = require("./models/prodact.js")
 
 
 app.post("/products", async (req, res) => {
