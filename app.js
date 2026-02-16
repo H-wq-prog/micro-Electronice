@@ -51,12 +51,12 @@ app.post("/login", async (req, res) => {
         const { email, password } = req.body;
         if (!email, !password)
             return res.status(400).json({ msg: "find one" })
-        const usre = await User.findOne({ email })
-        if (!user) return res.status(404).json({ msg: "your acconte is " })
+        const user = await User.findOne({ email })
+        if (!user) return res.status(404).json({ msg: "your acconte is not find " })
 
 
-        const matchpassowrd = await bcrypt.compare(password, user.hashPassword)
-        if (!hashPassword) return res.status(400).json({ msg: "invalid password" })
+        const matchpassowrd = await bcrypt.compare(password, user.Password)
+        if (!matchpassowrd) return res.status(400).json({ msg: "invalid password" })
         res.status(200).json({
             msg: "succes login"
         })
@@ -64,6 +64,70 @@ app.post("/login", async (req, res) => {
         console.log(error)
     }
 })
+
+const Product = require("./models/prodact")
+
+
+app.post("/products", async (req, res) => {
+    try {
+        const { productName, salrey } = req.body;
+
+
+        const product = await Product.findOne({ productName: productName });
+        if (product) {
+            product.stock += 1;
+            await product.save();
+
+            return res.status(200).json({
+                msg: "product is here",
+                data: product
+            });
+        } else {
+
+            const newProduct = new Product({
+                productName,
+                salrey,
+                stock: 1
+            });
+
+            const savedProduct = await newProduct.save();
+            return res.status(201).json({
+                msg: "new product",
+                data: savedProduct
+            });
+        }
+
+    } catch (error) {
+        res.status(400).json({
+            msg: "error",
+        });
+    }
+});
+
+app.get("/products", async (req, res) => {
+    try {
+        const products = await Product.find();
+        res.status(200).json(products);
+    } catch (error) {
+        res.status(400).json({ msg: "product is not find" });
+    }
+});
+
+
+app.get("/products/:id", async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+
+        if (!product) {
+            return res.status(404).json({ msg: "this prodact is not find" });
+        }
+
+        res.status(200).json(product);
+    } catch (error) {
+        res.status(500).json({ msg: "error" });
+    }
+});
+
 app.listen(post, () => {
     console.log(`the server work as ${post}`)
 })
